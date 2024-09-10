@@ -9,65 +9,67 @@ provider:
   region: ap-south-1
   stage: api
   environment:
-    DB_HOST: ${env:DB_HOST}
-    DB_USER: ${env:DB_USER}
-    DB_PASS: ${env:DB_PASS}
-    DB_NAME: ${env:DB_NAME}
-    DB_PORT: ${env:DB_PORT}
+    DB_URI: ${env:DB_URI}
 
 functions:
-  QRGen:
-    handler: functions/QRGen.handler
-    memorySize: 512
-    timeout: 30
+  app:
+    handler: app.handler
     events:
       - http:
-          path: QRGen
-          method: post
-          cors: true
-          integration: lambda
-  QRvalidate:
-    handler: functions/QRvalidate.handler
-    memorySize: 512
-    timeout: 30
-    events:
-      - http:
-          path: QRvalidate
-          method: post
-          cors: true
-          integration: lambda
-  genSession:
-    handler: functions/genSession.handler
-    memorySize: 512
-    timeout: 30
-    events:
-      - http:
-          path: genSession
-          method: post
-          cors: true
-          integration: lambda
-  dbTest:
-    handler: functions/dbTest.handler
-    memorySize: 512
-    timeout: 30
-    events:
-      - http:
-          path: dbTest
-          method: post
-          cors: true
-          integration: lambda
-  registerStudent:
-    handler: functions/registerStudent.handler
-    memorySize: 512
-    timeout: 30
-    events:
-      - http:
-          path: registerStudent
-          method: post
-          cors: true
-          integration: lambda
+          path: /{proxy+}
+          method: any
+  # QRGen:
+  #   handler: functions/QRGen.handler
+  #   memorySize: 512
+  #   timeout: 30
+  #   events:
+  #     - http:
+  #         path: QRGen
+  #         method: post
+  #         cors: true
+  #         integration: lambda
+  # QRvalidate:
+  #   handler: functions/QRvalidate.handler
+  #   memorySize: 512
+  #   timeout: 30
+  #   events:
+  #     - http:
+  #         path: QRvalidate
+  #         method: post
+  #         cors: true
+  #         integration: lambda
+  # genSession:
+  #   handler: functions/genSession.handler
+  #   memorySize: 512
+  #   timeout: 30
+  #   events:
+  #     - http:
+  #         path: genSession
+  #         method: post
+  #         cors: true
+  #         integration: lambda
+  # dbTest:
+  #   handler: functions/dbTest.handler
+  #   memorySize: 512
+  #   timeout: 30
+  #   events:
+  #     - http:
+  #         path: dbTest
+  #         method: post
+  #         cors: true
+  #         integration: lambda
+  # registerStudent:
+  #   handler: functions/registerStudent.handler
+  #   memorySize: 512
+  #   timeout: 30
+  #   events:
+  #     - http:
+  #         path: registerStudent
+  #         method: post
+  #         cors: true
+  #         integration: lambda
 
 plugins:
     - serverless-plugin-split-stacks
     - serverless-dotenv-plugin
-    # - serverless-offline
+    - serverless-offline

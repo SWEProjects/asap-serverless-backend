@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - master
-
+      - aditya_backend
+      - satyam_backend
 jobs:
   deploy:
     name: deploy
@@ -26,8 +27,4 @@ jobs:
         args: deploy
       env:
         SERVERLESS_ACCESS_KEY: ${{ vars.SERVERLESS_ACCESS_KEY }}
-        DB_HOST : ${{ vars.DB_HOST }}
-        DB_NAME : ${{ vars.DB_NAME }}
-        DB_PORT : ${{ vars.DB_PORT }}
-        DB_USER : ${{ vars.DB_USER }}
-        DB_PASS : ${{ vars.DB_PASS }}
+        DB_URI : ${{ vars.DB_URI }}
