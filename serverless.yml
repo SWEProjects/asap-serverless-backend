@@ -10,64 +10,17 @@ provider:
   stage: api
   environment:
     DB_URI: ${env:DB_URI}
+    JWT_SECRET: ${env:JWT_SECRET}
 
 functions:
   app:
     handler: app.handler
+    memorySize: 512
+    timeout: 30
     events:
       - http:
           path: /{proxy+}
           method: any
-  # QRGen:
-  #   handler: functions/QRGen.handler
-  #   memorySize: 512
-  #   timeout: 30
-  #   events:
-  #     - http:
-  #         path: QRGen
-  #         method: post
-  #         cors: true
-  #         integration: lambda
-  # QRvalidate:
-  #   handler: functions/QRvalidate.handler
-  #   memorySize: 512
-  #   timeout: 30
-  #   events:
-  #     - http:
-  #         path: QRvalidate
-  #         method: post
-  #         cors: true
-  #         integration: lambda
-  # genSession:
-  #   handler: functions/genSession.handler
-  #   memorySize: 512
-  #   timeout: 30
-  #   events:
-  #     - http:
-  #         path: genSession
-  #         method: post
-  #         cors: true
-  #         integration: lambda
-  # dbTest:
-  #   handler: functions/dbTest.handler
-  #   memorySize: 512
-  #   timeout: 30
-  #   events:
-  #     - http:
-  #         path: dbTest
-  #         method: post
-  #         cors: true
-  #         integration: lambda
-  # registerStudent:
-  #   handler: functions/registerStudent.handler
-  #   memorySize: 512
-  #   timeout: 30
-  #   events:
-  #     - http:
-  #         path: registerStudent
-  #         method: post
-  #         cors: true
-  #         integration: lambda
 
 plugins:
     - serverless-plugin-split-stacks

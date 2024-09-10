@@ -28,3 +28,4 @@ jobs:
       env:
         SERVERLESS_ACCESS_KEY: ${{ vars.SERVERLESS_ACCESS_KEY }}
         DB_URI : ${{ vars.DB_URI }}
+        JWT_SECRET : ${{ vars.JWT_SECRET }}
