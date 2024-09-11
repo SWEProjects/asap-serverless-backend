@@ -108,9 +108,11 @@ const resetPassword = async (req,res) => {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         if (faculty.rows.length){
             await db.query('UPDATE faculties SET f_password = $1 WHERE f_college_id = $2', [hashedPassword, email]);
+            await db.query('UPDATE faculties SET f_otp = NULL WHERE f_college_id = $2', [email]);
         }
         if (student.rows.length){
             await db.query('UPDATE students SET s_password = $1 WHERE s_college_id = $2', [hashedPassword, email]);
+            await db.query('UPDATE students SET s_otp = NULL WHERE s_college_id = $2', [email]);
         }
         let mailOptions = {
             from: process.env.EMAIL_USER,
