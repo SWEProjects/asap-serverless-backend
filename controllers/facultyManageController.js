@@ -41,6 +41,9 @@ const editProfile = async (req,res) => {
         try {
             const fid = decoded.facultyId;
             const {firstName, lastName, collegeId} = req.body;
+            if (!firstName ||!lastName ||!collegeId) {
+                return res.status(400).json({ message: 'Please provide required fields' });
+            }
             await db.query('UPDATE faculties SET f_first_name = $1, f_last_name = $2, f_college_id = $3 WHERE fid = $4', [firstName, lastName, collegeId, fid]);
             res.status(200).json({ message: 'Profile updated successfully' });
         } catch (error) {
