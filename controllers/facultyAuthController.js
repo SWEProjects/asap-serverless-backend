@@ -45,8 +45,8 @@ const registerFaculty = async (req, res) => {
                 message: 'Faculty Registration Success',
                 token:token
             });
-        } finally {
-
+        } catch (error) {
+            res.status(500).json({ message: error.message });
         }
 
         
