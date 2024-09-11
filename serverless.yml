@@ -11,6 +11,11 @@ provider:
   environment:
     DB_URI: ${env:DB_URI}
     JWT_SECRET: ${env:JWT_SECRET}
+    EMAIL_HOST: ${env:EMAIL_HOST}
+    EMAIL_PORT: ${env:EMAIL_PORT}
+    EMAIL_USER: ${env:EMAIL_USER}
+    EMAIL_PASS: ${env:EMAIL_PASS}
+    EMAIL_SECURE: ${env:EMAIL_SECURE}
 
 functions:
   app:

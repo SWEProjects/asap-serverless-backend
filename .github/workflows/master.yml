@@ -27,3 +27,8 @@ jobs:
         SERVERLESS_ACCESS_KEY: ${{ vars.SERVERLESS_ACCESS_KEY }}
         DB_URI : ${{ vars.DB_URI }}
         JWT_SECRET : ${{ vars.JWT_SECRET }}
+        EMAIL_HOST: ${{ vars.EMAIL_HOST }}
+        EMAIL_PORT: ${{ vars.EMAIL_PORT }}
+        EMAIL_USER: ${{ vars.EMAIL_USER }}
+        EMAIL_PASS: ${{ vars.EMAIL_PASS }}
+        EMAIL_SECURE: ${{ vars.EMAIL_SECURE }}
