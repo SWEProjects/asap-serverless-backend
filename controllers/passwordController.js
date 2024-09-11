@@ -93,4 +93,36 @@ const resetPasswordEmail = async (req, res) => {
         return res.status(500).json({ message: err.message });
     }
 }
-module.exports = {changePassword, resetPasswordEmail}
+
+const resetPassword = async (req,res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        if (!email ||!otp ||!newPassword) {
+            return res.status(400).json({ message: 'Please provide email, OTP and new password' });
+        }
+        const faculty = await db.query('SELECT * FROM faculties WHERE f_college_id = $1 AND f_otp = $2', [email, otp]);
+        const student = await db.query('SELECT * FROM students WHERE s_college_id = $1 AND s_otp = $2', [email, otp]);
+        if (!faculty.rows.length &&!student.rows.length) {
+            return res.status(403).json({ message: 'Invalid OTP' });
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        if (faculty.rows.length){
+            await db.query('UPDATE faculties SET f_password = $1 WHERE f_college_id = $2', [hashedPassword, email]);
+        }
+        if (student.rows.length){
+            await db.query('UPDATE students SET s_password = $1 WHERE s_college_id = $2', [hashedPassword, email]);
+        }
+        let mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email, 
+            subject: 'Password reset successfully', 
+            text: 'Your password has been reset successfully',
+        };
+        await transporter.sendMail(mailOptions);
+        return res.status(200).json({success:true, message: 'Password reset successfully' });
+    } catch (err) {
+        return res.status(500).json({ message: 'Password reset failed'});
+    }
+}
+
+module.exports = {changePassword, resetPasswordEmail, resetPassword}
