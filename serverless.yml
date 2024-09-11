@@ -28,6 +28,6 @@ functions:
           method: any
 
 plugins:
-    - serverless-plugin-split-stacks
+    # - serverless-plugin-split-stacks
     - serverless-dotenv-plugin
     - serverless-offline
