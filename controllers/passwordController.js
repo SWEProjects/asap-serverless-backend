@@ -1,6 +1,17 @@
 const db = require('../config/db');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
+
+let transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST, 
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_SECURE,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+});
 
 const JWT_SECRET = process.env.JWT_SECRET
 
@@ -48,4 +59,37 @@ const changePassword = async (req, res) => {
     }
 }
 
-module.exports = {changePassword}
+const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000);
+}
+
+const resetPasswordEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: 'Please provide an email' });
+        }
+        const faculty = await db.query('SELECT * FROM faculties WHERE f_college_id = $1', [email]);
+        const student = await db.query('SELECT * FROM students WHERE s_college_id = $1', [email]);
+        if (!faculty.rows.length && !student.rows.length) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const otp = generateOTP();
+        if (faculty.rows.length) {
+            await db.query('UPDATE faculties SET f_otp = $1 WHERE f_college_id = $2', [otp, email]);
+        } else {
+            await db.query('UPDATE students SET s_otp = $1 WHERE s_college_id = $2', [otp, email]);
+        }
+        let mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email, 
+            subject: 'OTP for password reset', 
+            text: otp.toString(),
+        };
+        await transporter.sendMail(mailOptions);
+        return res.status(200).json({ success: true, message: 'OTP sent to your email' });
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+}
+module.exports = {changePassword, resetPasswordEmail}
