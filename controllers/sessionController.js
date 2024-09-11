@@ -106,4 +106,37 @@ const closeSession = async (req, res) => {
     } 
 }
 
-module.exports = {createSession, openSession, closeSession}
+const deleteSession = async (req,res) => {
+    try {
+        const token = req.headers.authorization;
+        if (!token){
+            return res.status(403).json({ message: 'Not a Faculty' });
+        }
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const fid = decoded.facultyId;
+        if (!fid){
+            return res.status(403).json({ message: 'Not a Faculty' });
+        }
+        try {
+            const { sessionId } = req.body;
+            if (!sessionId) {
+                return res.status(400).json({ message: 'Missing required fields' });
+            }
+            const checkSession = await db.query('SELECT * FROM sessions WHERE sessid = $1',[sessionId]);
+            if (!checkSession.rows.length) {
+                return res.status(403).json({ message: 'Session not found' });
+            }
+            await db.query('DELETE FROM sessions WHERE sessid = $1', [sessionId]);
+            return res.status(200).json({
+                success : true,
+                message: 'Session deleted successfully'
+            })
+        } catch (e) { 
+            return res.status(500).json({ message: 'Failed to delete session' , e : e})
+        }
+    } catch (e) {
+        return res.status(403).json({ message: 'Not a Faculty' })
+    } 
+}
+
+module.exports = {createSession, openSession, closeSession, deleteSession}
