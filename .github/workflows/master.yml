@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-      - aditya_backend
-      - satyam_backend
 jobs:
   deploy:
     name: deploy
