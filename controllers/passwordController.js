@@ -50,6 +50,7 @@ const changePassword = async (req, res) => {
                     await db.query('UPDATE students SET s_password = $1 WHERE sid = $2', [hashedPassword, decoded.studentId]);
                     return res.status(200).json({success:true, message: 'Password changed successfully' });
                 }
+                return res.status(403).json({message: 'Incorrect Password'});
             }
         } catch (err) {
             return res.status(500).json({ message: err.message });
