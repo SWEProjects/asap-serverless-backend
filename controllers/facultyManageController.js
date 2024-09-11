@@ -31,4 +31,24 @@ const editCourses = async (req, res) => {
     }
 }
 
-module.exports = {editCourses}
+const editProfile = async (req,res) => {
+    try {
+        const token = req.headers.authorization
+        if (!token){
+            return res.status(403).json({ message: 'Not a Faculty', token : token })
+        }
+        const decoded = jwt.verify(token, JWT_SECRET)
+        try {
+            const fid = decoded.facultyId;
+            const {firstName, lastName, collegeId} = req.body;
+            await db.query('UPDATE faculties SET f_first_name = $1, f_last_name = $2, f_college_id = $3 WHERE fid = $4', [firstName, lastName, collegeId, fid]);
+            res.status(200).json({ message: 'Profile updated successfully' });
+        } catch (error) {
+            return res.status(403).json({ message: "Failed to update profile", error: error });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+module.exports = {editCourses, editProfile}
