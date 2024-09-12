@@ -16,6 +16,7 @@ provider:
     EMAIL_USER: ${env:EMAIL_USER}
     EMAIL_PASS: ${env:EMAIL_PASS}
     EMAIL_SECURE: ${env:EMAIL_SECURE}
+    CRYPTO_SECRET: ${env:CRYPTO_SECRET}
 
 functions:
   app:
