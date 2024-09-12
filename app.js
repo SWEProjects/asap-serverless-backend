@@ -7,6 +7,8 @@ const facultyManageRoutes = require('./routes/facultyManageRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
 const resetRoutes = require('./routes/resetRoutes');
 const passwordRoutes = require('./routes/passwordRoutes');
+const QrRoutes = require('./routes/QrRoutes');
+const attendanceRoutes = require('./routes/attendanceRoutes');
 const serverless = require('serverless-http');
 connectDB();
 
@@ -18,5 +20,7 @@ app.use('/session', sessionRoutes);
 app.use('/manage/faculty', facultyManageRoutes);
 app.use('/reset', resetRoutes)
 app.use('/password', passwordRoutes)
+app.use('/qr', QrRoutes)
+app.use('/attendance', attendanceRoutes)
 
 module.exports.handler = serverless(app);
