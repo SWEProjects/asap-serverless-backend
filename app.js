@@ -1,4 +1,5 @@
 const express = require('express');
+const serverless = require('serverless-http');
 require('dotenv').config()
 const {connectDB} = require('./config/db');
 const studentAuthRoutes = require('./routes/studentAuthRoutes');
@@ -8,8 +9,7 @@ const sessionRoutes = require('./routes/sessionRoutes');
 const resetRoutes = require('./routes/resetRoutes');
 const passwordRoutes = require('./routes/passwordRoutes');
 const QrRoutes = require('./routes/QrRoutes');
-const attendanceRoutes = require('./routes/attendanceRoutes');
-const serverless = require('serverless-http');
+const attendanceRoutes = require('./routes/attendanceRoutes.js');
 connectDB();
 
 const app = express();

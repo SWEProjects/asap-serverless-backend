@@ -9,45 +9,75 @@ const markAttendanceByQR = async (req, res) => {
     try {
         const scannedTime = Date.now()
         const token = req.headers.authorization;
-        if (!token){
+        if (!token) {
             return res.status(401).json({ message: 'Not authorized' });
         }
         const decoded = jwt.verify(token, JWT_SECRET);
         const sid = decoded.studentId;
-        if (!sid){
+        if (!sid) {
             return res.status(401).json({ message: 'Not a student' });
         }
         try {
-            const {QRText} = req.body;
+            const { QRText } = req.body;
             if (!QRText) {
                 return res.status(400).json({ message: 'Missing QR text' });
             }
             const [iv, encrypted] = QRText.split(':');
-            const decipher = crypto.createDecipheriv('aes-256-cbc', CRYPTO_SECRET , Buffer.from(iv, 'hex'));
+            const decipher = crypto.createDecipheriv('aes-256-cbc', CRYPTO_SECRET, Buffer.from(iv, 'hex'));
             let decrypted = decipher.update(encrypted, 'hex', 'utf8');
             decrypted += decipher.final('utf8');
             const QRTime = decrypted.split('$')[2];
-            const isValidated = scannedTime - QRTime <= 10*1000;
+            const isValidated = scannedTime - QRTime <= 10 * 1000;
             if (!isValidated) {
                 return res.status(403).json({ message: 'QR code expired' });
             }
             const sessionId = decrypted.split('$')[0];
-            const checkSession = await db.query('SELECT * FROM sessions WHERE sessid = $1 AND is_active = true',[sessionId]);
+            const checkSession = await db.query('SELECT * FROM sessions WHERE sessid = $1 AND is_active = true', [sessionId]);
             if (!checkSession.rows.length) {
                 return res.status(404).json({ message: 'Session not found or not active' });
             }
-            const checkAttendance = await db.query('SELECT * FROM attendance WHERE session_id = $1 AND sid = $2',[sessionId, sid]);
+            const checkAttendance = await db.query('SELECT * FROM attendance WHERE session_id = $1 AND sid = $2', [sessionId, sid]);
             if (checkAttendance.rows.length) {
                 return res.status(403).json({ message: 'Attendance already marked for this session' });
             }
-            await db.query('INSERT INTO attendance (session_id, sid) VALUES ($1, $2)',[sessionId, sid]);
-            return res.status(200).json({ success : true, message: 'Attendance marked successfully' });
-        } catch (err) { 
+            await db.query('INSERT INTO attendance (session_id, sid) VALUES ($1, $2)', [sessionId, sid]);
+            return res.status(200).json({ success: true, message: 'Attendance marked successfully' });
+        } catch (err) {
             return res.status(500).json({ message: 'Unable to mark attendance, Please try again' });
         }
     } catch (err) {
-        return res.status(401).json({message : 'Not authorized'})
+        return res.status(401).json({ message: 'Not authorized' })
     }
 }
 
-module.exports = {markAttendanceByQR}
+const markAttendance = async (req, res) => {
+    try {
+        const token = req.headers.authorization;
+        if (!token) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const fid = decoded.facultyId;
+        if (!fid) {
+            return res.status(401).json({ message: 'Not a Faculty' });
+        }
+        try {
+            const { sid, session_id } = req.body;
+            if (!sid || !session_id) {
+                return res.status(400).json({ message: 'Missing required fields' });
+            }
+            const checkSession = await db.query('SELECT * FROM sessions WHERE sessid = $1 AND is_active = true', [session_id]);
+            if (!checkSession.rows.length) {
+                return res.status(404).json({ message: 'Session is not active' });
+            }
+            await db.query('INSERT INTO attendance (session_id, sid) VALUES ($1, $2)', [session_id, sid]);
+            return res.status(200).json({ success: true, message: 'Attendance marked successfully' });
+        } catch (e) {
+            return res.status(500).json({ message: 'Unable to mark attendance, Please try again' });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: 'Something Went Wrong' });
+    }
+}
+
+module.exports = { markAttendanceByQR , markAttendance}
