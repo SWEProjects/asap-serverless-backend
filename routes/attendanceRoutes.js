@@ -3,7 +3,7 @@ const { markAttendanceByQR, markAttendance } = require('../controllers/attendanc
 
 const router = express.Router();
 
-router.post('/markByQR', markAttendanceByQR);
+router.post('/mark/qr', markAttendanceByQR);
 router.post('/mark/manual', markAttendance)
 
 module.exports = router;
