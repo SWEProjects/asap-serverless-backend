@@ -10,6 +10,7 @@ const resetRoutes = require('./routes/resetRoutes');
 const passwordRoutes = require('./routes/passwordRoutes');
 const QrRoutes = require('./routes/QrRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes.js');
+const tokenRoutes = require('./routes/tokenRoutes.js');
 connectDB();
 
 const app = express();
@@ -22,5 +23,6 @@ app.use('/reset', resetRoutes)
 app.use('/password', passwordRoutes)
 app.use('/qr', QrRoutes)
 app.use('/attendance', attendanceRoutes)
+app.use('/token', tokenRoutes)
 
 module.exports.handler = serverless(app);
