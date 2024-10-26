@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const validateToken = async (req, res) => {
     try {
@@ -20,6 +20,7 @@ const validateToken = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Invalid JWT' });
     }
-}
 
-module.exports = { validateToken }
+};
+
+module.exports = { validateToken };
