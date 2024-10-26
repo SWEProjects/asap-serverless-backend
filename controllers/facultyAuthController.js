@@ -15,7 +15,8 @@ const loginFaculty = async (req, res) => {
             return res.status(200).json({
                 success: true,
                 message: 'Faculty Login Success',
-                token: token
+                token: token,
+                facultyId : result.rows[0].fid
             });
         }
         return res.status(400).json({ message: 'Invalid credentials' });
