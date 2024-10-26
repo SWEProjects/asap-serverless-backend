@@ -27,8 +27,8 @@ const loginStudent = async (req, res) => {
 
 const registerStudent = async (req, res) => {
     try {
-        const { firstName, lastName, rollNumber, semester, collegeId, password, secret } = req.body;
-        if (!firstName || !rollNumber || !semester || !collegeId || !password || !secret) {
+        const { firstName, lastName, rollNumber, collegeId, password, secret } = req.body;
+        if (!firstName || !rollNumber || !collegeId || !password || !secret) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
         const checkStudent = await db.query('SELECT * FROM students WHERE s_college_id = $1',[collegeId]);
@@ -38,7 +38,7 @@ const registerStudent = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         try{
             await db.query('BEGIN')
-            const student = await db.query('INSERT INTO students (s_first_name, s_last_name, s_college_id, s_password, s_device_id, s_roll_number, s_semester) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING sid',[firstName, lastName || null, collegeId ,hashedPassword, secret, rollNumber, semester]);
+            const student = await db.query('INSERT INTO students (s_first_name, s_last_name, s_college_id, s_password, s_device_id, s_roll_number) VALUES ($1,$2,$3,$4,$5,$6) RETURNING sid',[firstName, lastName || null, collegeId ,hashedPassword, secret, rollNumber]);
             const token = jwt.sign({ studentId: student.rows[0].sid }, JWT_SECRET, { expiresIn: '1h' });
             await db.query('COMMIT')
             return res.status(200).json({
