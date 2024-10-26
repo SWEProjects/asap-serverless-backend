@@ -16,7 +16,8 @@ const loginStudent = async (req, res) => {
             return res.status(200).json({
                 success: true,
                 message: 'Student Login Success',
-                token: token
+                token: token,
+                studentId: result.rows[0].sid
             });
         }
         return res.status(400).json({ message: 'Invalid credentials' });
@@ -44,7 +45,8 @@ const registerStudent = async (req, res) => {
             return res.status(200).json({
                 success : true,
                 message: 'Student Registration Success',
-                token:token
+                token:token,
+                studentId: student.rows[0].sid
             });
         } catch (e) {
             await db.query('ROLLBACK')

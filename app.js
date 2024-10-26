@@ -11,6 +11,8 @@ const passwordRoutes = require('./routes/passwordRoutes');
 const QrRoutes = require('./routes/QrRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes.js');
 const tokenRoutes = require('./routes/tokenRoutes.js');
+const studentManageRoutes = require('./routes/studentManageRoutes')
+const commonManageRoutes = require('./routes/commonManageRoutes')
 connectDB();
 
 const app = express();
@@ -24,5 +26,7 @@ app.use('/password', passwordRoutes)
 app.use('/qr', QrRoutes)
 app.use('/attendance', attendanceRoutes)
 app.use('/token', tokenRoutes)
+app.use('/manage/student', studentManageRoutes)
+app.use('/manage', commonManageRoutes)
 
 module.exports.handler = serverless(app);
