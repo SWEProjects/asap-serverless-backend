@@ -30,4 +30,31 @@ const selectBatch = async (req, res) => {
     }
 }
 
-module.exports = {selectBatch}
+const selectCourses = async (req, res) => {
+    try {
+        const token = req.headers.authorization
+        if (!token){
+            return res.status(403).json({ message: 'JWT Token Required' })
+        }
+        const decoded = jwt.verify(token, JWT_SECRET)
+        try {
+            const sid = decoded.studentId;
+            const {courseIds} = req.body;
+            if (!courseIds || !courseIds.length) {
+                return res.status(400).json({ message: 'Please provide course IDs' });
+            }
+            await db.query('BEGIN')
+            await db.query('DELETE FROM students_courses WHERE sid = $1', [sid])
+            await db.query('INSERT INTO students_courses (sid, cid) VALUES ($1, unnest($2::int[]))', [sid, courseIds])
+            await db.query('COMMIT')
+            res.status(201).json({ message: 'Course added successfully' });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+        
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+module.exports = {selectBatch, selectCourses}
