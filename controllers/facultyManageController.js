@@ -21,7 +21,7 @@ const editCourses = async (req, res) => {
             await db.query('DELETE FROM faculty_courses WHERE fid = $1', [fid])
             await db.query('INSERT INTO faculty_courses (fid, cid) VALUES ($1, unnest($2::int[]))', [fid, courseIds])
             await db.query('COMMIT')
-            res.status(201).json({ message: 'Course added successfully' });
+            res.status(200).json({ message: 'Course added successfully' });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
