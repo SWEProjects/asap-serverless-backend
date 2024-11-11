@@ -1,8 +1,9 @@
 const express = require('express');
-const { selectBatch } = require('../controllers/studentManageController');
+const { selectBatch, selectCourses } = require('../controllers/studentManageController');
 
 const router = express.Router();
 
 router.post('/assign/batch', selectBatch);
+router.post('/assign/courses', selectCourses);
 
 module.exports = router;

@@ -40,7 +40,12 @@ const markAttendanceByQR = async (req, res) => {
             if (checkAttendance.rows.length) {
                 return res.status(403).json({ message: 'Attendance already marked for this session' });
             }
-            await db.query('INSERT INTO attendance (session_id, sid) VALUES ($1, $2)', [sessionId, sid]);
+            const getBatch = await db.query('SELECT b.current_sem AS semester FROM batch b JOIN students s ON b.id=s.s_batch WHERE s.sid = $1',[sid]);
+            if (!getBatch.rows.length) {
+                return res.status(404).json({ message: 'Batch not found' });
+            }
+            const semester = getBatch.rows[0].semester;
+            await db.query('INSERT INTO attendance (session_id, sid, semester) VALUES ($1, $2, $3)', [sessionId, sid, semester]);
             return res.status(200).json({ success: true, message: 'Attendance marked successfully' });
         } catch (err) {
             return res.status(500).json({ message: 'Unable to mark attendance, Please try again' });
@@ -70,7 +75,12 @@ const markAttendance = async (req, res) => {
             if (!checkSession.rows.length) {
                 return res.status(404).json({ message: 'Session is not active' });
             }
-            await db.query('INSERT INTO attendance (session_id, sid) VALUES ($1, $2)', [session_id, sid]);
+            const getBatch = await db.query('SELECT b.current_sem AS semester FROM batch b JOIN students s ON b.id=s.s_batch WHERE s.sid = $1',[sid]);
+            if (!getBatch.rows.length) {
+                return res.status(404).json({ message: 'Batch not found' });
+            }
+            const semester = getBatch.rows[0].semester;
+            await db.query('INSERT INTO attendance (session_id, sid, semester) VALUES ($1, $2, $3, $4)', [session_id, sid, semester]);
             return res.status(200).json({ success: true, message: 'Attendance marked successfully' });
         } catch (e) {
             return res.status(500).json({ message: 'Unable to mark attendance, Please try again' });
