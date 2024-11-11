@@ -31,6 +31,26 @@ const editCourses = async (req, res) => {
     }
 }
 
+const getCurrentCourses = async (req, res) => {
+    try {
+        const token = req.headers.authorization
+        if (!token){
+            return res.status(403).json({ message: 'Not a Faculty', token : token })
+        }
+        const decoded = jwt.verify(token, JWT_SECRET)
+        try {
+            const fid = decoded.facultyId;
+            const courses = await db.query('SELECT c.cid AS course_id, c.c_name AS course_name, c.c_code AS course_code FROM faculty_courses fc JOIN courses c ON fc.cid = c.cid WHERE fc.fid = $1', [fid]);
+            res.status(200).json({ courses: courses.rows });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+        
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 const editProfile = async (req,res) => {
     try {
         const token = req.headers.authorization
@@ -54,4 +74,4 @@ const editProfile = async (req,res) => {
     }
 }
 
-module.exports = {editCourses, editProfile}
+module.exports = {editCourses, editProfile, getCurrentCourses}
