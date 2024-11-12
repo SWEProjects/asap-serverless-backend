@@ -48,7 +48,7 @@ const getDepartments = async (req, res) => {
         }
         const decoded = jwt.verify(token, JWT_SECRET)
         try {
-            const departments = await db.query('SELECT d_name AS department_name, did AS department_id FROM departments');
+            const departments = await db.query('SELECT did AS department_id, d_acronym AS department_code, d_name AS department_name FROM departments');
             res.status(200).json({status : 200, departments : departments.rows});
         } catch (error) {
             res.status(500).json({ message: error.message });
