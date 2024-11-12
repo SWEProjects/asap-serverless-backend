@@ -12,7 +12,7 @@ const getBatches = async (req,res) => {
         }
         const decoded = jwt.verify(token, JWT_SECRET)
         try {
-            const batches = await db.query('SELECT * FROM batch');
+            const batches = await db.query('SELECT id AS batch_id, batch_name, current_sem, batch_start, batch_end FROM batch');
             res.status(200).json({status : 200, availableBatches : batches.rows});
         } catch (error) {
             res.status(500).json({ message: error.message });

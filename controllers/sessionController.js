@@ -12,15 +12,15 @@ const createSession = async (req, res) => {
         const decoded = jwt.verify(token, JWT_SECRET);
         const fid = decoded.facultyId;
         try {
-            const { sessionCourse ,sessionDate, sessionTime, sessionDept} = req.body;
-            if (!sessionCourse || !sessionDate || !sessionTime || !sessionDept) {
+            const { sessionCourse ,sessionDate, sessionTime, sessionDept, sessionBatch} = req.body;
+            if (!sessionCourse || !sessionDate || !sessionTime || !sessionDept || !sessionBatch) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
         const checkCourseFaculty = await db.query('SELECT * FROM faculty_courses WHERE fid = $1 AND cid = $2',[fid, sessionCourse]);
         if (!checkCourseFaculty.rows.length) {
             return res.status(403).json({ message: 'Not authorized to create session for this course' });
         }
-        const result = await db.query('INSERT INTO sessions (cid, sessiondate, sessiontime, did, fid) VALUES ($1, $2, $3, $4, $5) RETURNING sessid', [sessionCourse, sessionDate, sessionTime, sessionDept, fid]);
+        const result = await db.query('INSERT INTO sessions (cid, sessiondate, sessiontime, did, fid, batch_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING sessid', [sessionCourse, sessionDate, sessionTime, sessionDept, fid, sessionBatch]);
         return res.status(200).json({
             success : true,
             message: 'Session created successfully',
