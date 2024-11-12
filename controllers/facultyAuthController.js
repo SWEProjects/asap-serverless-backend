@@ -11,7 +11,7 @@ const loginFaculty = async (req, res) => {
         }
         const result = await db.query('SELECT * FROM faculties WHERE f_college_id = $1', [collegeId]);
         if (result.rows.length && await bcrypt.compare(password, result.rows[0].f_password)) {
-            const token = jwt.sign({ facultyId: result.rows[0].fid }, JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ facultyId: result.rows[0].fid }, JWT_SECRET, { expiresIn: '12h' });
             return res.status(200).json({
                 success: true,
                 message: 'Faculty Login Success',
@@ -39,7 +39,7 @@ const registerFaculty = async (req, res) => {
         try{
             await db.query('BEGIN')
             const faculty = await db.query('INSERT INTO faculties (f_first_name, f_last_name, f_college_id, f_password) VALUES ($1,$2,$3,$4) RETURNING fid',[firstName, lastName || null, collegeId ,hashedPassword]);
-            const token = jwt.sign({ facultyId: faculty.rows[0].fid }, JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ facultyId: faculty.rows[0].fid }, JWT_SECRET, { expiresIn: '12h' });
             await db.query('COMMIT')
             return res.status(200).json({
                 success : true,
