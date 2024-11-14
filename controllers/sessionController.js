@@ -182,4 +182,27 @@ const editSession = async (req,res) => {
     }
 }
 
+const getSessions = async (req, res) => {
+    try {
+        const token = req.headers.authorization
+        if (!token){
+            return res.status(403).json({ message: 'No JWT Provided' })
+        }
+        const decoded = jwt.verify(token, JWT_SECRET)
+        const facultyId = decoded.facultyId
+        if (!facultyId){
+            return res.status(403).json({ message: 'Not a Faculty' })
+        }
+        try {
+            const sessions = await db.query('SELECT s. FROM sessions s JOIN courses c ON s.cid = c.cid JOIN departments d ON s.did = d.did JOIN batch b ON s.batch_id = b.id');
+            res.status(200).json({status : 200, sessions : sessions.rows});
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid JWT' });
+    }
+}
+
+
 module.exports = {createSession, openSession, closeSession, deleteSession, editSession}
