@@ -203,7 +203,7 @@ const getSessions = async (req, res) => {
                                             d.d_name AS dept_name,
                                             d.d_acronym AS dept_code,
                                             b.batch_name AS batch_name,
-                                            b.current_sem AS session_sem
+                                            b.current_sem AS session_sem,
                                             s.is_active AS session_open
                                             FROM sessions s 
                                             JOIN courses c ON s.cid = c.cid 
