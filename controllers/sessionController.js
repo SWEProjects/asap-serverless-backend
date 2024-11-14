@@ -20,7 +20,7 @@ const createSession = async (req, res) => {
         if (!checkCourseFaculty.rows.length) {
             return res.status(403).json({ message: 'Not authorized to create session for this course' });
         }
-        const result = await db.query('INSERT INTO sessions (cid, sessiondate, sessiontime, did, fid, batch_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING sessid', [sessionCourse, sessionDate, sessionTime, sessionDept, fid, sessionBatch]);
+        const result = await db.query('INSERT INTO sessions (cid, sessiondate, did, fid, batch_id) VALUES ($1, $2, $3, $4, $5) RETURNING sessid', [sessionCourse, `${sessionDate} ${sessionTime}`, sessionDept, fid, sessionBatch]);
         return res.status(200).json({
             success : true,
             message: 'Session created successfully',
@@ -182,4 +182,54 @@ const editSession = async (req,res) => {
     }
 }
 
-module.exports = {createSession, openSession, closeSession, deleteSession, editSession}
+const getSessions = async (req, res) => {
+    try {
+        const token = req.headers.authorization
+        if (!token){
+            return res.status(403).json({ message: 'No JWT Provided' })
+        }
+        const decoded = jwt.verify(token, JWT_SECRET)
+        const facultyId = decoded.facultyId
+        if (!facultyId){
+            return res.status(403).json({ message: 'Not a Faculty' })
+        }
+        try {
+            const sessions = await db.query(`SELECT s.sessid AS session_id, 
+                                            f.f_first_name AS faculty_first_name, 
+                                            f.f_last_name AS faculty_last_name, 
+                                            s.sessiondate AS session_time, 
+                                            c.c_name AS course_name, 
+                                            c.c_code AS course_code,
+                                            d.d_name AS dept_name,
+                                            d.d_acronym AS dept_code,
+                                            b.batch_name AS batch_name,
+                                            b.current_sem AS session_sem
+                                            s.is_active AS session_open
+                                            FROM sessions s 
+                                            JOIN courses c ON s.cid = c.cid 
+                                            JOIN departments d ON s.did = d.did 
+                                            JOIN batch b ON s.batch_id = b.id 
+                                            JOIN faculties f ON f.fid = s.fid`);
+            const formattedSessions = sessions.rows.map(session => {
+                const sessionDate = new Date(session.session_time);
+                const formattedDate = sessionDate.toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                }).replace(',','').toUpperCase();
+                return { ...session, session_time: formattedDate };
+            });
+            res.status(200).json({status : 200, sessions : formattedSessions});
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid JWT' });
+    }
+}
+
+
+module.exports = {createSession, openSession, closeSession, deleteSession, editSession, getSessions}
