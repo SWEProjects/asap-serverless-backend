@@ -31,6 +31,9 @@ const getQR = async (req,res) => {
         }
         try {
             const { sessionId } = req.body;
+            if (!sessionId){
+                return res.status(400).json({ message: 'Missing required fields' });
+            }
             const salt = uuid()
             const iv = crypto.randomBytes(16);
             const cipher = crypto.createCipheriv('aes-256-cbc', CRYPTO_SECRET, iv);
