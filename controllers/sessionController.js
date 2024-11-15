@@ -222,7 +222,10 @@ const getSessions = async (req, res) => {
                 }).replace(',','').toUpperCase();
                 return { ...session, session_time: formattedDate };
             });
-            res.status(200).json({status : 200, sessions : formattedSessions});
+            const openSessions = formattedSessions.filter((session)=>session.session_open)
+            const closedSessions = formattedSessions.filter((session)=>!session.session_open)
+            const sortedSessions = [...openSessions,...closedSessions]
+            res.status(200).json({status : 200, sessions : sortedSessions});
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
