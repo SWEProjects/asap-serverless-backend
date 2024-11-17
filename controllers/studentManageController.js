@@ -13,14 +13,14 @@ const selectBatch = async (req, res) => {
         const decoded = jwt.verify(token, JWT_SECRET)
         try {
             const sid = decoded.studentId;
-            const {batchId} = req.body;
-            if (!batchId) {
-                return res.status(400).json({ message: 'Please provide batch' });
+            const {batchId, branchId} = req.body;
+            if (!batchId || !branchId) {
+                return res.status(400).json({ message: 'Please provide batch and branch id' });
             }
             await db.query('BEGIN')
-            await db.query('UPDATE students SET s_batch = $1 WHERE sid = $2  ', [batchId, sid])
+            await db.query('UPDATE students SET s_batch = $1, s_branch = $2 WHERE sid = $3  ', [batchId, branchId, sid])
             await db.query('COMMIT')
-            res.status(201).json({ message: 'Batch assigned successfully' });
+            res.status(201).json({ message: 'Batch and Branch assigned successfully' });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
