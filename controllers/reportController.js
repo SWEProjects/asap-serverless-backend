@@ -29,9 +29,14 @@ const getReport = async (req,res) => {
                                         JOIN attendance a ON st.sid = a.sid 
                                         JOIN sessions se ON a.session_id = se.sessid
                                         WHERE se.cid = $1 AND se.did = $2 AND se.batch_id = $3`,[courseId, departmentId, batchId]);
+        const sessions = await db.query(`SELECT COUNT(sessid) AS total_sessions 
+                                        FROM sessions 
+                                        WHERE cid = $1, did = $2, batch_id = $3`, [courseId, departmentId, batchId]);
+        const totalSessions = sessions.rows[0].total_sessions;
         res.status(200).json({
             status : 200,
-            students : students.rows
+            students : students.rows,
+            totalSessions : totalSessions
         })
     } catch (e) {
         return res.status(500).json({ message: 'Server Error' })
