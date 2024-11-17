@@ -52,7 +52,7 @@ const getReportForStudents = async (req, res) => {
         const decoded = jwt.verify(token, JWT_SECRET)
         const studentId = decoded.studentId;
         if (!studentId){
-            return res.status(403).json({ message: 'Not a Faculty' })
+            return res.status(403).json({ message: 'Not a Student' })
         }
         const coursesReport = await db.query(`SELECT c.c_name AS course_name,
                                             c.c_code AS course_code,
