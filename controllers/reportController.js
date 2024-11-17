@@ -43,4 +43,39 @@ const getReport = async (req,res) => {
     }
 }
 
-module.exports = { getReport }
+const getReportForStudents = async (req, res) => {
+    try {
+        const token = req.headers.authorization
+        if (!token){
+            return res.status(403).json({ message: 'No JWT Provided' })
+        }
+        const decoded = jwt.verify(token, JWT_SECRET)
+        const studentId = decoded.studentId;
+        if (!studentId){
+            return res.status(403).json({ message: 'Not a Faculty' })
+        }
+        const coursesReport = await db.query(`SELECT c.c_name AS course_name,
+                                            c.c_code AS course_code,
+                                                (SELECT COUNT(*) 
+                                                FROM sessions se
+                                                WHERE se.cid = c.cid AND se.did = d.did AND se.batch_id = b.id) AS total_sessions,
+                                                (SELECT COUNT(*) 
+                                                FROM attendance a 
+                                                JOIN sessions se ON a.session_id = se.sessid 
+                                                WHERE se.cid = c.cid AND se.did = d.did AND se.batch_id = b.id AND s.sid = $1 AND a.marked_at IS NOT NULL) AS total_present
+                                            FROM students s 
+                                            JOIN batch b ON s.s_batch = b.id
+                                            JOIN students_courses sc ON sc.sid = s.sid
+                                            JOIN courses c ON sc.cid = c.cid
+                                            JOIN departments d ON d.did = s.s_branch
+                                            WHERE s.sid = $1`, [studentId]);
+        res.status(200).json({
+            status : 200,
+            coursesReport : coursesReport.rows
+        })
+    } catch (e) {
+        return res.status(500).json({ message: 'Server Error', e })
+    }
+}
+
+module.exports = { getReport, getReportForStudents }
