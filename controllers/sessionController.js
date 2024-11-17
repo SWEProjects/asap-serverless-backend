@@ -314,10 +314,15 @@ const getSession = async (req, res) => {
                                         JOIN students_courses sc ON s.sid = sc.sid 
                                         JOIN attendance a ON s.sid = a.sid AND a.session_id = $4 
                                         WHERE s.s_batch = $1 AND s.s_branch = $2 AND sc.cid = $3`, [formattedSessions[0].batch_id, formattedSessions[0].department_id, formattedSessions[0].course_id, sessionId]);
+            const presentStudents = students.rows.filter((student)=>student.marked_at);
+            const presentAmount = presentStudents.length;
+            const totalAmount = students.rows.length
             return res.status(200).json({
                 status : 200,
                 session : formattedSessions[0],
-                students : students.rows
+                students : students.rows,
+                presentAmount : presentAmount,
+                totalAmount : totalAmount
             })
         } catch (e) {
             res.status(500).json({ message: error.message });
