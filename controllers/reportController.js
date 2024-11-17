@@ -31,7 +31,7 @@ const getReport = async (req,res) => {
                                         WHERE se.cid = $1 AND se.did = $2 AND se.batch_id = $3`,[courseId, departmentId, batchId]);
         const sessions = await db.query(`SELECT COUNT(sessid) AS total_sessions 
                                         FROM sessions 
-                                        WHERE cid = $1, did = $2, batch_id = $3`, [courseId, departmentId, batchId]);
+                                        WHERE cid = $1 AND did = $2 AND batch_id = $3`, [courseId, departmentId, batchId]);
         const totalSessions = sessions.rows[0].total_sessions;
         res.status(200).json({
             status : 200,
@@ -39,7 +39,7 @@ const getReport = async (req,res) => {
             totalSessions : totalSessions
         })
     } catch (e) {
-        return res.status(500).json({ message: 'Server Error' })
+        return res.status(500).json({ message: 'Server Error', e })
     }
 }
 
