@@ -13,6 +13,7 @@ const attendanceRoutes = require('./routes/attendanceRoutes.js');
 const tokenRoutes = require('./routes/tokenRoutes.js');
 const studentManageRoutes = require('./routes/studentManageRoutes')
 const commonManageRoutes = require('./routes/commonManageRoutes')
+const reportRoutes = require('./routes/reportRoutes')
 connectDB();
 
 const app = express();
@@ -28,5 +29,6 @@ app.use('/attendance', attendanceRoutes)
 app.use('/token', tokenRoutes)
 app.use('/manage/student', studentManageRoutes)
 app.use('/manage', commonManageRoutes)
+app.use('/report', reportRoutes)
 
 module.exports.handler = serverless(app);
