@@ -1,5 +1,5 @@
 const express = require('express');
-const { createSession, openSession, closeSession, deleteSession, editSession, getSessions } = require('../controllers/sessionController');
+const { createSession, openSession, closeSession, deleteSession, editSession, getSessions, getSession } = require('../controllers/sessionController');
 
 const router = express.Router();
 
@@ -9,5 +9,6 @@ router.post('/close', closeSession);
 router.post('/delete', deleteSession); 
 router.post('/edit', editSession);
 router.get('/all', getSessions);
+router.post('/info', getSession);
 
 module.exports = router;
