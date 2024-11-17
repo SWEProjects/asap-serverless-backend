@@ -3,6 +3,22 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET
 
+const prepareStudentListForAttendance = async (sessionId) => {
+    try {
+        if (!sessionId){
+            return res.status(400).json({ message: 'Missing session ID' })
+        }
+        const sessions = await db.query('SELECT * from sessions WHERE sessid = $1', [sessionId])
+        if (!sessions.rows.length){
+            return res.status(404).json({ message: 'Session not found' })
+        }
+        const session = sessions.rows[0];
+        db.query('INSERT INTO attendance (session_id, sid) SELECT $4, s.sid FROM students s JOIN students_courses sc ON s.sid = sc.sid WHERE s.s_batch = $1 AND s.s_branch = $2 AND sc.cid = $3;', [session.batch_id, session.did, session.cid, sessionId]);
+    } catch (e) {
+        throw Error({ error : e, message : 'Error while getting students'})
+    }
+}
+
 const createSession = async (req, res) => {
     try {
         const token = req.headers.authorization;
@@ -21,6 +37,8 @@ const createSession = async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to create session for this course' });
         }
         const result = await db.query('INSERT INTO sessions (cid, sessiondate, did, fid, batch_id) VALUES ($1, $2, $3, $4, $5) RETURNING sessid', [sessionCourse, `${sessionDate} ${sessionTime}`, sessionDept, fid, sessionBatch]);
+        const sessionId = result.rows[0].sessid;
+        await prepareStudentListForAttendance(sessionId);
         return res.status(200).json({
             success : true,
             message: 'Session created successfully',
