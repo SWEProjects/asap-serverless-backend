@@ -57,4 +57,24 @@ const selectCourses = async (req, res) => {
     }
 }
 
-module.exports = {selectBatch, selectCourses}
+const getCurrentCourses = async (req, res) => {
+    try {
+        const token = req.headers.authorization
+        if (!token){
+            return res.status(403).json({ message: 'Not a Student', token : token })
+        }
+        const decoded = jwt.verify(token, JWT_SECRET)
+        try {
+            const sid = decoded.studentId;
+            const courses = await db.query('SELECT c.cid AS course_id, c.c_name AS course_name, c.c_code AS course_code FROM students_courses sc JOIN courses c ON sc.cid = c.cid WHERE sc.sid = $1', [sid]);
+            res.status(200).json({ courses: courses.rows });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+        
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+module.exports = {selectBatch, selectCourses, getCurrentCourses}
