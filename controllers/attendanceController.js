@@ -45,7 +45,7 @@ const markAttendanceByQR = async (req, res) => {
                 return res.status(404).json({ message: 'Batch not found' });
             }
             const semester = getBatch.rows[0].semester;
-            await db.query('INSERT INTO attendance (session_id, sid, semester) VALUES ($1, $2, $3)', [sessionId, sid, semester]);
+            await db.query('UPDATE attendance set marked_at = CURRENT_TIMESTAMP WHERE session_id = $1 AND sid = $2 AND semester = $3', [sessionId, sid, semester]);
             return res.status(200).json({ success: true, message: 'Attendance marked successfully' });
         } catch (err) {
             return res.status(500).json({ message: 'Unable to mark attendance, Please try again' });
