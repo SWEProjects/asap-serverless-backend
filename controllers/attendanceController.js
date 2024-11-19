@@ -36,7 +36,7 @@ const markAttendanceByQR = async (req, res) => {
             if (!checkSession.rows.length) {
                 return res.status(404).json({ message: 'Session not found or not active' });
             }
-            const checkAttendance = await db.query('SELECT * FROM attendance WHERE session_id = $1 AND sid = $2', [sessionId, sid]);
+            const checkAttendance = await db.query('SELECT * FROM attendance WHERE session_id = $1 AND sid = $2 AND marked_at IS NOT NULL', [sessionId, sid]);
             if (checkAttendance.rows.length) {
                 return res.status(403).json({ message: 'Attendance already marked for this session' });
             }
