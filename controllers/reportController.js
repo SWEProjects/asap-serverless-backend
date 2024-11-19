@@ -61,7 +61,7 @@ const getReportForStudents = async (req, res) => {
                                                 WHERE se.cid = c.cid AND se.did = d.did AND se.batch_id = b.id) AS total_sessions,
                                                 (SELECT COUNT(*) 
                                                 FROM attendance a 
-                                                JOIN sessions se ON a.session_id = se.sessid 
+                                                JOIN sessions se ON a.session_id = se.sessid AND a.sid = $1
                                                 WHERE se.cid = c.cid AND se.did = d.did AND se.batch_id = b.id AND s.sid = $1 AND a.marked_at IS NOT NULL) AS total_present
                                             FROM students s 
                                             JOIN batch b ON s.s_batch = b.id
